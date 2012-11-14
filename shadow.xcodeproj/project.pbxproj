@@ -10,6 +10,7 @@
 		87AAD21F1654578800F0AE71 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87AAD21E1654578800F0AE71 /* Foundation.framework */; };
 		87AAD2221654578800F0AE71 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 87AAD2211654578800F0AE71 /* main.m */; };
 		87AAD2261654578800F0AE71 /* shadow.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 87AAD2251654578800F0AE71 /* shadow.1 */; };
+		87AAD22D165459CB00F0AE71 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87AAD22C165459CB00F0AE71 /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,7 @@
 		87AAD2211654578800F0AE71 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		87AAD2241654578800F0AE71 /* shadow-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "shadow-Prefix.pch"; sourceTree = "<group>"; };
 		87AAD2251654578800F0AE71 /* shadow.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = shadow.1; sourceTree = "<group>"; };
+		87AAD22C165459CB00F0AE71 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				87AAD22D165459CB00F0AE71 /* Cocoa.framework in Frameworks */,
 				87AAD21F1654578800F0AE71 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,6 +68,7 @@
 		87AAD21D1654578800F0AE71 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				87AAD22C165459CB00F0AE71 /* Cocoa.framework */,
 				87AAD21E1654578800F0AE71 /* Foundation.framework */,
 			);
 			name = Frameworks;
