@@ -8,6 +8,26 @@
 
 #import <Cocoa/Cocoa.h>
 
+// 指定した値より透明なピクセルを透明度0（透過率100%）にした画像を返す
+//      setColorは処理が遅い、よって巨大な画像では時間がかかる
+NSImage* transparentImageByAlphaValue(NSImage* image)
+{
+    NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
+    NSColor *clearColor = [NSColor colorWithCalibratedRed:0.0 green:0.0 blue:0.0 alpha:0.0];
+    for (int y=0; y<imageRep.pixelsHigh; y++) {
+        for (int x=0; x<imageRep.pixelsWide; x++) {
+            NSColor *color = [imageRep colorAtX:x y:y];
+            if ([color alphaComponent] < 1) {
+//                NSLog(@"(%i, %i) %f", x, y, [color alphaComponent]);
+                [imageRep setColor:clearColor atX:x y:y];
+            }
+        }
+    }
+    CGImageRef cgimage = [imageRep CGImage];
+    NSImage *transparentImage = [[NSImage alloc] initWithCGImage:cgimage size:NSZeroSize];
+    return transparentImage;
+}
+
 // 左側の境界座標を返す
 NSInteger trimLeft(NSBitmapImageRep *imageRep)
 {
@@ -208,8 +228,10 @@ int main(int argc, char * argv[])
             // 影の領域を削除した画像にする
             NSRect trimRect = trimRectFromImageByAlphaValue(image, 255);
             NSImage *trimImage = trimImageByRect(image, trimRect);
+            // trimRect内の影を透明にする
+            NSImage *transparentImage = transparentImageByAlphaValue(trimImage);
             // 影付きイメージを生成する
-            NSImage *shadowImage = dropshadowImage(trimImage, blurRadius, alphaValue);
+            NSImage *shadowImage = dropshadowImage(transparentImage, blurRadius, alphaValue);
             // PNG画像として保存する
             saveImageByPNG(shadowImage, shadowPath);
             // 画像情報を出力する
