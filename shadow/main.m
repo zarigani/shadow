@@ -8,6 +8,99 @@
 
 #import <Cocoa/Cocoa.h>
 
+// 左側の境界座標を返す
+NSInteger trimLeft(NSBitmapImageRep *imageRep)
+{
+    for (int x=0; x<imageRep.pixelsWide; x++) {
+        for (int y=0; y<imageRep.pixelsHigh; y++) {
+            NSColor *color = [imageRep colorAtX:x y:y];
+            if ([color alphaComponent] >= 1.0) return x;
+        }
+    }
+    return 0;
+}
+
+// 右側の境界座標を返す
+NSInteger trimRight(NSBitmapImageRep *imageRep)
+{
+    for (NSInteger x=imageRep.pixelsWide - 1; x>=0; x--) {
+        for (NSInteger y=0; y<imageRep.pixelsHigh; y++) {
+            NSColor *color = [imageRep colorAtX:x y:y];
+            if ([color alphaComponent] >= 1.0) return (x + 1);
+        }
+    }
+    return 0;
+}
+
+// 上側の境界座標を返す
+NSInteger trimTop(NSBitmapImageRep *imageRep)
+{
+    for (NSInteger y=0; y<imageRep.pixelsHigh; y++) {
+        for (NSInteger x=0; x<imageRep.pixelsWide; x++) {
+            NSColor *color = [imageRep colorAtX:x y:y];
+            if ([color alphaComponent] >= 1.0) return (imageRep.pixelsHigh - y);
+        }
+    }
+    return 0;
+}
+
+// 下側の境界座標を返す
+NSInteger trimBottom(NSBitmapImageRep *imageRep)
+{
+    for (NSInteger y=imageRep.pixelsHigh - 1; y>=0; y--) {
+        for (NSInteger x=0; x<imageRep.pixelsWide; x++) {
+            NSColor *color = [imageRep colorAtX:x y:y];
+            if ([color alphaComponent] >= 1.0) return (imageRep.pixelsHigh - 1 - y);
+        }
+    }
+    return 0;
+}
+
+// 指定した透明度以上の領域を含む最小のrectを返す
+NSRect trimRectFromImageByAlphaValue(NSImage *image, int limit)
+{
+    NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation] ];
+    // スケールを取得する  // NSLog(@"scale = %f", scale);  //例 Retina scale = 2.000000
+    CGFloat scale = [ [NSScreen mainScreen] backingScaleFactor];
+    
+    NSRect trimRect = NSZeroRect;
+    trimRect.origin.x = (float)trimLeft(imageRep)/scale;
+    trimRect.origin.y = (float)trimBottom(imageRep)/scale;
+    trimRect.size.width = (float)trimRight(imageRep)/scale - trimRect.origin.x;
+    trimRect.size.height = (float)trimTop(imageRep)/scale - trimRect.origin.y;
+    
+//    NSLog(@"%f, %f, %f, %f", trimRect.origin.x, trimRect.origin.y, trimRect.size.width, trimRect.size.height);
+    return trimRect;
+}
+
+// 指定した範囲に画像を切り取って返す
+NSImage* trimImageByRect(NSImage *image, NSRect trimRect)
+{
+    //スケールを取得する
+    CGFloat scale = [ [NSScreen mainScreen] backingScaleFactor];
+    //Retina環境に応じたポイントサイズを取得する
+    NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation] ];
+    NSSize pointSize = NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale);
+    //解像度を統一する（画像によって72dpiと144dpiの2つの設定があるので）
+    [image setSize:pointSize];
+    //描画する場所を準備
+    NSRect newRect = NSZeroRect;
+    newRect.size = trimRect.size;
+    NSImage *newImage = [ [NSImage alloc] initWithSize:newRect.size];
+    //描画する場所=newImageに狙いを定める、描画環境を保存しておく
+    [newImage lockFocus];
+    [NSGraphicsContext saveGraphicsState];
+    //拡大・縮小した時の補間品質の指定
+    [ [NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+    //描画する
+    [image drawAtPoint:NSZeroPoint fromRect:trimRect operation:NSCompositeSourceOver fraction:1.0];
+    //描画環境を元に戻す、描画する場所=newImageから狙いを外す
+    [NSGraphicsContext restoreGraphicsState];
+    [newImage unlockFocus];
+    
+    return newImage;
+}
+
 // 影付きイメージを描画して返す
 NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue)
 {
@@ -112,8 +205,11 @@ int main(int argc, char * argv[])
             
             NSImage *image = [[NSImage alloc] initWithContentsOfFile:fPath];
             
+            // 影の領域を削除した画像にする
+            NSRect trimRect = trimRectFromImageByAlphaValue(image, 255);
+            NSImage *trimImage = trimImageByRect(image, trimRect);
             // 影付きイメージを生成する
-            NSImage *shadowImage = dropshadowImage(image, blurRadius, alphaValue);
+            NSImage *shadowImage = dropshadowImage(trimImage, blurRadius, alphaValue);
             // PNG画像として保存する
             saveImageByPNG(shadowImage, shadowPath);
             // 画像情報を出力する
