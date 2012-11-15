@@ -129,7 +129,7 @@ NSImage* trimImageByRect(NSImage *image, NSRect trimRect)
 }
 
 // 影付きイメージを描画して返す
-NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue)
+NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline)
 {
     float margin = blurRadius * 1.25;
     //スケールを取得する
@@ -147,22 +147,25 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue)
     [NSGraphicsContext saveGraphicsState];
     //拡大・縮小した時の補間品質の指定
     [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-    //影の設定（輪郭線のため）
+    
     NSShadow *shadow = [[NSShadow alloc] init];
-    [shadow setShadowOffset:NSZeroSize];
-    [shadow setShadowBlurRadius:1.0];
-    [shadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:alphaValue]];
-    [shadow set];
-    //描画する（輪郭線のため）
     NSRect drawRect;
-    drawRect.origin = NSMakePoint(margin, margin);
-    drawRect.size = dotSize;
-    [image drawInRect:drawRect
-             fromRect:NSZeroRect
-            operation:NSCompositeSourceOver
-             fraction:1.0
-       respectFlipped:YES
-                hints:nil];
+    if (outline) {
+        //影の設定（輪郭線のため）
+        [shadow setShadowOffset:NSZeroSize];
+        [shadow setShadowBlurRadius:1.0];
+        [shadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:alphaValue]];
+        [shadow set];
+        //描画する（輪郭線のため）
+        drawRect.origin = NSMakePoint(margin, margin);
+        drawRect.size = dotSize;
+        [image drawInRect:drawRect
+                 fromRect:NSZeroRect
+                operation:NSCompositeSourceOver
+                 fraction:1.0
+           respectFlipped:YES
+                    hints:nil];
+    }
     //影の設定
     [shadow setShadowOffset:NSMakeSize(0.0, -blurRadius * 0.25)];
     [shadow setShadowBlurRadius:blurRadius];
@@ -177,6 +180,7 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue)
              fraction:1.0
        respectFlipped:YES
                 hints:nil];
+    
     //描画環境を元に戻す、描画する場所=newImageから狙いを外す
     [NSGraphicsContext restoreGraphicsState];
     [newImage unlockFocus];
@@ -205,12 +209,13 @@ int main(int argc, char * argv[])
         int opt, i;
         float blurRadius = 8.0;
         float alphaValue = 0.5;
-        NSString *commandText = @"";
+        bool outline = YES;
+        NSString *optText = @"";
         
         //opterr = 0;/* エラーメッセージを非表示にする */
         
-        while((opt = getopt(argc, argv, "a:b:")) != -1){
-            commandText = [commandText stringByAppendingString:[NSString stringWithFormat:@"-%c%s", opt, optarg]];
+        while((opt = getopt(argc, argv, "a:b:o")) != -1){
+            optText = [optText stringByAppendingString:[NSString stringWithFormat:@"-%c%s", opt, optarg ? optarg : ""]];
             switch(opt){
                 case 'a':
                     sscanf(optarg, "%f", &alphaValue);
@@ -220,6 +225,11 @@ int main(int argc, char * argv[])
                 case 'b':
                     sscanf(optarg, "%f", &blurRadius);
                     printf("  Option -%c = %f\n", opt, blurRadius);
+                    break;
+                    
+                case 'o':
+                    outline = NO;
+                    printf("  Option -%c\n", opt);
                     break;
                     
                     // 解析できないオプションが見つかった場合は「?」を返す
@@ -245,7 +255,7 @@ int main(int argc, char * argv[])
             NSString *fExt = [fPath pathExtension];                     // e
             NSString *fDirName = [fPath stringByDeletingPathExtension]; // /Users/HOME/a/b/c.d
 //            NSLog(@"name.ext=%@  ext=%@  dir=%@  dir/name=%@", fNameExt, fExt, fDir, fDirName);
-            NSString *outputPath = [NSString stringWithFormat:@"%@-shadow%@.%@", fDirName, commandText, fExt];
+            NSString *outputPath = [NSString stringWithFormat:@"%@-shadow%@.%@", fDirName, optText, fExt];
             
             NSImage *image = [[NSImage alloc] initWithContentsOfFile:fPath];
             NSRect imageRect = NSMakeRect(0, 0, image.size.width, image.size.height);
@@ -257,7 +267,7 @@ int main(int argc, char * argv[])
                 image = transparentImageByAlphaValue(image);
             }
             // 影付きイメージを生成する
-            image = dropshadowImage(image, blurRadius, alphaValue);
+            image = dropshadowImage(image, blurRadius, alphaValue, outline);
             // PNG画像として保存する
             saveImageByPNG(image, outputPath);
             // 画像情報を出力する
