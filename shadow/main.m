@@ -205,10 +205,12 @@ int main(int argc, char * argv[])
         int opt, i;
         float blurRadius = 8.0;
         float alphaValue = 0.5;
+        NSString *commandText = @"";
         
         //opterr = 0;/* エラーメッセージを非表示にする */
         
         while((opt = getopt(argc, argv, "a:b:")) != -1){
+            commandText = [commandText stringByAppendingString:[NSString stringWithFormat:@"-%c%s", opt, optarg]];
             switch(opt){
                 case 'a':
                     sscanf(optarg, "%f", &alphaValue);
@@ -242,7 +244,7 @@ int main(int argc, char * argv[])
             NSString *fExt = [fPath pathExtension];                     // e
             NSString *fDirName = [fPath stringByDeletingPathExtension]; // /Users/HOME/a/b/c.d
 //            NSLog(@"name.ext=%@  ext=%@  dir=%@  dir/name=%@", fNameExt, fExt, fDir, fDirName);
-            NSString *shadowPath = [[fDirName stringByAppendingString:@"-shadow."] stringByAppendingString:fExt];
+            NSString *outputPath = [NSString stringWithFormat:@"%@-shadow%@.%@", fDirName, commandText, fExt];
             
             NSImage *image = [[NSImage alloc] initWithContentsOfFile:fPath];
             
@@ -254,10 +256,10 @@ int main(int argc, char * argv[])
             // 影付きイメージを生成する
             NSImage *shadowImage = dropshadowImage(transparentImage, blurRadius, alphaValue);
             // PNG画像として保存する
-            saveImageByPNG(shadowImage, shadowPath);
+            saveImageByPNG(shadowImage, outputPath);
             // 画像情報を出力する
             NSRect align = [shadowImage alignmentRect];
-            NSLog(@"%@ (%f, %f, %f, %f)", shadowPath, align.origin.x, align.origin.y, align.size.width, align.size.height);
+            NSLog(@"%@ (%f, %f, %f, %f)", outputPath, align.origin.x, align.origin.y, align.size.width, align.size.height);
         }        
     }
     return 0;
