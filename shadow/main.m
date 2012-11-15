@@ -199,6 +199,16 @@ void saveImageByPNG(NSImage *image, NSString* fileName)
     [data writeToFile:fileName atomically:YES];
 }
 
+void showUsage()
+{
+    printf("Usage: dropshadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<)] FILE ...\n");
+    printf("Example:\n");
+    printf("    shadow test.png          ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
+    printf("    shadow -b4 test.png      ->  Nano shadow\n");
+    printf("    shadow -b2 test.png      ->  Line shadow\n");
+    printf("    shadow -b0 -a0 test.png  ->  None shadow\n");
+}
+
 
 
 
@@ -207,40 +217,33 @@ int main(int argc, char * argv[])
     
     @autoreleasepool {
         int opt, i;
-        float blurRadius = 8.0;
-        float alphaValue = 0.5;
-        bool outline = YES;
+        float blurRadius = 8.0; // -b
+        float alphaValue = 0.5; // -a
+        bool outline = YES;     // -o
         NSString *optText = @"";
         
         //opterr = 0;/* エラーメッセージを非表示にする */
         
-        while((opt = getopt(argc, argv, "a:b:o")) != -1){
+        while((opt = getopt(argc, argv, "a:b:oh")) != -1){
             optText = [optText stringByAppendingString:[NSString stringWithFormat:@"-%c%s", opt, optarg ? optarg : ""]];
             switch(opt){
                 case 'a':
                     sscanf(optarg, "%f", &alphaValue);
-                    printf("  Option -%c = %f\n", opt, alphaValue);
                     break;
-                    
                 case 'b':
                     sscanf(optarg, "%f", &blurRadius);
-                    printf("  Option -%c = %f\n", opt, blurRadius);
                     break;
-                    
                 case 'o':
                     outline = NO;
-                    printf("  Option -%c\n", opt);
                     break;
-                    
-                    // 解析できないオプションが見つかった場合は「?」を返す
-                    // オプション引数が不足している場合も「?」を返す
+                case 'h':
+                    showUsage();
+                    return 0;
+                
+                // 解析できないオプションが見つかった場合は「?」を返す
+                // オプション引数が不足している場合も「?」を返す
                 case '?':
-                    printf("Usage: dropshadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<)] FILE ...\n");
-                    printf("Example:\n");
-                    printf("    shadow test.png          ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
-                    printf("    shadow -b4 test.png      ->  Nano shadow\n");
-                    printf("    shadow -b2 test.png      ->  Line shadow\n");
-                    printf("    shadow -b0 -a0 test.png  ->  None shadow\n");
+                    showUsage();
                     return 1;
             }
         }
