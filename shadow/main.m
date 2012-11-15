@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 extern float const BBKAlphaLimit;
-float const BBKAlphaLimit = 0.8;
+float const BBKAlphaLimit = 0.9;
 
 // 指定した値より透明なピクセルを透明度0（透過率100%）にした画像を返す
 //      setColorは処理が遅い、よって巨大な画像では時間がかかる
@@ -21,7 +21,11 @@ NSImage* transparentImageByAlphaValue(NSImage* image)
         for (int x=0; x<imageRep.pixelsWide; x++) {
             NSColor *color = [imageRep colorAtX:x y:y];
             if ([color alphaComponent] < BBKAlphaLimit) {
-//                NSLog(@"(%i, %i) %f", x, y, [color alphaComponent]);
+//                CGFloat a = [color alphaComponent];
+//                CGFloat r = [color redComponent];
+//                CGFloat g = [color greenComponent];
+//                CGFloat b = [color blueComponent];
+//                NSLog(@"(%i, %i) %f %f %f %f", x, y,a, r, g, b);
                 [imageRep setColor:clearColor atX:x y:y];
             }
         }
@@ -46,7 +50,7 @@ NSInteger trimLeft(NSBitmapImageRep *imageRep)
 // 右側の境界座標を返す
 NSInteger trimRight(NSBitmapImageRep *imageRep)
 {
-    for (NSInteger x=imageRep.pixelsWide - 1; x>=0; x--) {
+    for (NSInteger x=imageRep.pixelsWide; x>=0; x--) {
         for (NSInteger y=0; y<imageRep.pixelsHigh; y++) {
             NSColor *color = [imageRep colorAtX:x y:y];
             if ([color alphaComponent] >= BBKAlphaLimit) return (x + 1);
@@ -70,10 +74,10 @@ NSInteger trimTop(NSBitmapImageRep *imageRep)
 // 下側の境界座標を返す
 NSInteger trimBottom(NSBitmapImageRep *imageRep)
 {
-    for (NSInteger y=imageRep.pixelsHigh - 1; y>=0; y--) {
+    for (NSInteger y=imageRep.pixelsHigh; y>=0; y--) {
         for (NSInteger x=0; x<imageRep.pixelsWide; x++) {
             NSColor *color = [imageRep colorAtX:x y:y];
-            if ([color alphaComponent] >= BBKAlphaLimit) return (imageRep.pixelsHigh - 1 - y);
+            if ([color alphaComponent] >= BBKAlphaLimit) return (imageRep.pixelsHigh - y - 1);
         }
     }
     return 0;
