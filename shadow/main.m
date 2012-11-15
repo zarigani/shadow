@@ -225,11 +225,12 @@ int main(int argc, char * argv[])
                     // 解析できないオプションが見つかった場合は「?」を返す
                     // オプション引数が不足している場合も「?」を返す
                 case '?':
-                    printf("Unknown or required argument option -%c\n", optopt);
                     printf("Usage: dropshadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<)] FILE ...\n");
                     printf("Example:\n");
-                    printf("    dropshadow test.png       ->  Default shadow(= dropshadow -a 0.5 -b 8 test.png)\n");
-                    printf("    dropshadow -b 2 test.png  ->  Outline only\n");
+                    printf("    shadow test.png          ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
+                    printf("    shadow -b4 test.png      ->  Nano shadow\n");
+                    printf("    shadow -b2 test.png      ->  Line shadow\n");
+                    printf("    shadow -b0 -a0 test.png  ->  None shadow\n");
                     return 1;
             }
         }
