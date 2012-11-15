@@ -248,19 +248,20 @@ int main(int argc, char * argv[])
             NSString *outputPath = [NSString stringWithFormat:@"%@-shadow%@.%@", fDirName, commandText, fExt];
             
             NSImage *image = [[NSImage alloc] initWithContentsOfFile:fPath];
-            
-            // 影の領域を削除した画像にする
+            NSRect imageRect = NSMakeRect(0, 0, image.size.width, image.size.height);
             NSRect trimRect = trimRectFromImageByAlphaValue(image);
-            NSImage *trimImage = trimImageByRect(image, trimRect);
-            // 影の部分を透明にする
-            NSImage *transparentImage = transparentImageByAlphaValue(trimImage);
+            if (!NSEqualRects(trimRect, imageRect)) {
+                // 影の領域を削除した画像にする
+                image = trimImageByRect(image, trimRect);
+                // 影の部分を透明にする
+                image = transparentImageByAlphaValue(image);
+            }
             // 影付きイメージを生成する
-            NSImage *shadowImage = dropshadowImage(transparentImage, blurRadius, alphaValue);
+            image = dropshadowImage(image, blurRadius, alphaValue);
             // PNG画像として保存する
-            saveImageByPNG(shadowImage, outputPath);
+            saveImageByPNG(image, outputPath);
             // 画像情報を出力する
-            NSRect align = [shadowImage alignmentRect];
-            NSLog(@"%@ (%f, %f, %f, %f)", outputPath, align.origin.x, align.origin.y, align.size.width, align.size.height);
+            NSLog(@"%@ %@", outputPath, NSStringFromRect(imageRect));
         }        
     }
     return 0;
