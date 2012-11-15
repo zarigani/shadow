@@ -143,14 +143,28 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue)
     [NSGraphicsContext saveGraphicsState];
     //拡大・縮小した時の補間品質の指定
     [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-    //影の設定
+    //影の設定（輪郭線のため）
     NSShadow *shadow = [[NSShadow alloc] init];
+    [shadow setShadowOffset:NSZeroSize];
+    [shadow setShadowBlurRadius:1.0];
+    [shadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:alphaValue]];
+    [shadow set];
+    //描画する（輪郭線のため）
+    NSRect drawRect;
+    drawRect.origin = NSMakePoint(margin, margin);
+    drawRect.size = dotSize;
+    [image drawInRect:drawRect
+             fromRect:NSZeroRect
+            operation:NSCompositeSourceOver
+             fraction:1.0
+       respectFlipped:YES
+                hints:nil];
+    //影の設定
     [shadow setShadowOffset:NSMakeSize(0.0, -blurRadius * 0.25)];
     [shadow setShadowBlurRadius:blurRadius];
     [shadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:alphaValue]];
     [shadow set];
     //描画する
-    NSRect drawRect;
     drawRect.origin = NSMakePoint(margin, margin);
     drawRect.size = dotSize;
     [image drawInRect:drawRect
