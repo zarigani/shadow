@@ -8,6 +8,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+extern float const BBKAlphaLimit;
+float const BBKAlphaLimit = 0.8;
+
 // 指定した値より透明なピクセルを透明度0（透過率100%）にした画像を返す
 //      setColorは処理が遅い、よって巨大な画像では時間がかかる
 NSImage* transparentImageByAlphaValue(NSImage* image)
@@ -17,7 +20,7 @@ NSImage* transparentImageByAlphaValue(NSImage* image)
     for (int y=0; y<imageRep.pixelsHigh; y++) {
         for (int x=0; x<imageRep.pixelsWide; x++) {
             NSColor *color = [imageRep colorAtX:x y:y];
-            if ([color alphaComponent] < 1) {
+            if ([color alphaComponent] < BBKAlphaLimit) {
 //                NSLog(@"(%i, %i) %f", x, y, [color alphaComponent]);
                 [imageRep setColor:clearColor atX:x y:y];
             }
@@ -34,7 +37,7 @@ NSInteger trimLeft(NSBitmapImageRep *imageRep)
     for (int x=0; x<imageRep.pixelsWide; x++) {
         for (int y=0; y<imageRep.pixelsHigh; y++) {
             NSColor *color = [imageRep colorAtX:x y:y];
-            if ([color alphaComponent] >= 1.0) return x;
+            if ([color alphaComponent] >= BBKAlphaLimit) return x;
         }
     }
     return 0;
@@ -46,7 +49,7 @@ NSInteger trimRight(NSBitmapImageRep *imageRep)
     for (NSInteger x=imageRep.pixelsWide - 1; x>=0; x--) {
         for (NSInteger y=0; y<imageRep.pixelsHigh; y++) {
             NSColor *color = [imageRep colorAtX:x y:y];
-            if ([color alphaComponent] >= 1.0) return (x + 1);
+            if ([color alphaComponent] >= BBKAlphaLimit) return (x + 1);
         }
     }
     return 0;
@@ -58,7 +61,7 @@ NSInteger trimTop(NSBitmapImageRep *imageRep)
     for (NSInteger y=0; y<imageRep.pixelsHigh; y++) {
         for (NSInteger x=0; x<imageRep.pixelsWide; x++) {
             NSColor *color = [imageRep colorAtX:x y:y];
-            if ([color alphaComponent] >= 1.0) return (imageRep.pixelsHigh - y);
+            if ([color alphaComponent] >= BBKAlphaLimit) return (imageRep.pixelsHigh - y);
         }
     }
     return 0;
@@ -70,14 +73,14 @@ NSInteger trimBottom(NSBitmapImageRep *imageRep)
     for (NSInteger y=imageRep.pixelsHigh - 1; y>=0; y--) {
         for (NSInteger x=0; x<imageRep.pixelsWide; x++) {
             NSColor *color = [imageRep colorAtX:x y:y];
-            if ([color alphaComponent] >= 1.0) return (imageRep.pixelsHigh - 1 - y);
+            if ([color alphaComponent] >= BBKAlphaLimit) return (imageRep.pixelsHigh - 1 - y);
         }
     }
     return 0;
 }
 
 // 指定した透明度以上の領域を含む最小のrectを返す
-NSRect trimRectFromImageByAlphaValue(NSImage *image, int limit)
+NSRect trimRectFromImageByAlphaValue(NSImage *image)
 {
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation] ];
     // スケールを取得する  // NSLog(@"scale = %f", scale);  //例 Retina scale = 2.000000
@@ -226,9 +229,9 @@ int main(int argc, char * argv[])
             NSImage *image = [[NSImage alloc] initWithContentsOfFile:fPath];
             
             // 影の領域を削除した画像にする
-            NSRect trimRect = trimRectFromImageByAlphaValue(image, 255);
+            NSRect trimRect = trimRectFromImageByAlphaValue(image);
             NSImage *trimImage = trimImageByRect(image, trimRect);
-            // trimRect内の影を透明にする
+            // 影の部分を透明にする
             NSImage *transparentImage = transparentImageByAlphaValue(trimImage);
             // 影付きイメージを生成する
             NSImage *shadowImage = dropshadowImage(transparentImage, blurRadius, alphaValue);
