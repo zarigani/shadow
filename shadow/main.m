@@ -201,12 +201,17 @@ void saveImageByPNG(NSImage *image, NSString* fileName)
 
 void showUsage()
 {
-    printf("Usage: dropshadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<)] FILE ...\n");
+    printf("\n");
+    printf("Usage: dropshadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-owh] [FILE ...]\n");
+    printf("  -o  Without outline.\n");
+    printf("  -w  Rewrite original file.\n");
+    printf("  -h  Help.\n");
+    printf("\n");
     printf("Example:\n");
-    printf("    shadow test.png          ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
-    printf("    shadow -b4 test.png      ->  Nano shadow\n");
-    printf("    shadow -b2 test.png      ->  Line shadow\n");
-    printf("    shadow -b0 -a0 test.png  ->  None shadow\n");
+    printf("  shadow test.png          ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
+    printf("  shadow -b4 test.png      ->  Nano shadow\n");
+    printf("  shadow -b2 test.png      ->  Line shadow\n");
+    printf("  shadow -b0 -a0 test.png  ->  None shadow\n");
 }
 
 
@@ -220,11 +225,12 @@ int main(int argc, char * argv[])
         float blurRadius = 8.0; // -b
         float alphaValue = 0.5; // -a
         bool outline = YES;     // -o
+        bool rewrite = NO;      // -w
         NSString *optText = @"";
         
         //opterr = 0;/* エラーメッセージを非表示にする */
         
-        while((opt = getopt(argc, argv, "a:b:oh")) != -1){
+        while((opt = getopt(argc, argv, "a:b:owh")) != -1){
             optText = [optText stringByAppendingString:[NSString stringWithFormat:@"-%c%s", opt, optarg ? optarg : ""]];
             switch(opt){
                 case 'a':
@@ -235,6 +241,9 @@ int main(int argc, char * argv[])
                     break;
                 case 'o':
                     outline = NO;
+                    break;
+                case 'w':
+                    rewrite = YES;
                     break;
                 case 'h':
                     showUsage();
@@ -258,7 +267,12 @@ int main(int argc, char * argv[])
             NSString *fExt = [fPath pathExtension];                     // e
             NSString *fDirName = [fPath stringByDeletingPathExtension]; // /Users/HOME/a/b/c.d
 //            NSLog(@"name.ext=%@  ext=%@  dir=%@  dir/name=%@", fNameExt, fExt, fDir, fDirName);
-            NSString *outputPath = [NSString stringWithFormat:@"%@-shadow%@.%@", fDirName, optText, fExt];
+            NSString *outputPath;
+            if (rewrite) {
+                outputPath = fPath;
+            }else{
+                outputPath = [NSString stringWithFormat:@"%@-shadow%@.%@", fDirName, optText, fExt];
+            }
             
             NSImage *image = [[NSImage alloc] initWithContentsOfFile:fPath];
             NSRect imageRect = NSMakeRect(0, 0, image.size.width, image.size.height);
