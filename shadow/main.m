@@ -11,6 +11,18 @@
 extern float const BBKAlphaLimit;
 float const BBKAlphaLimit = 0.9;
 
+// ディスプレイスケールを取得する  // NSLog(@"scale = %f", scale);  //例 Retina scale = 2.000000
+CGFloat displayScale()
+{
+    // http://stackoverflow.com/questions/11344076/how-to-get-nsscreen-backingscalefactor-on-cocoa-targeting-10-6
+    // building for the OS X 10.7 SDK, with the deployment target set to 10.6.
+    if ([[NSScreen mainScreen] respondsToSelector:@selector(backingScaleFactor)]) {
+        return [ [NSScreen mainScreen] backingScaleFactor];
+    }else{
+        return 1.0;
+    }
+}
+
 // 指定した値より透明なピクセルを透明度0（透過率100%）にした画像を返す
 //      setColorは処理が遅い、よって巨大な画像では時間がかかる
 NSImage* transparentImageByAlphaValue(NSImage* image)
@@ -87,8 +99,7 @@ NSInteger trimBottom(NSBitmapImageRep *imageRep)
 NSRect trimRectFromImageByAlphaValue(NSImage *image)
 {
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation] ];
-    // スケールを取得する  // NSLog(@"scale = %f", scale);  //例 Retina scale = 2.000000
-    CGFloat scale = [ [NSScreen mainScreen] backingScaleFactor];
+    CGFloat scale = displayScale();
     
     NSRect trimRect = NSZeroRect;
     trimRect.origin.x = (float)trimLeft(imageRep)/scale;
@@ -103,8 +114,7 @@ NSRect trimRectFromImageByAlphaValue(NSImage *image)
 // 指定した範囲に画像を切り取って返す
 NSImage* trimImageByRect(NSImage *image, NSRect trimRect)
 {
-    //スケールを取得する
-    CGFloat scale = [ [NSScreen mainScreen] backingScaleFactor];
+    CGFloat scale = displayScale();
     //Retina環境に応じたポイントサイズを取得する
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation] ];
     NSSize pointSize = NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale);
@@ -132,8 +142,7 @@ NSImage* trimImageByRect(NSImage *image, NSRect trimRect)
 NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline)
 {
     float margin = blurRadius * 1.25;
-    //スケールを取得する
-    CGFloat scale = [[NSScreen mainScreen] backingScaleFactor];
+    CGFloat scale = displayScale();
     //Retina環境に応じたポイントサイズを取得する
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
     NSSize dotSize = NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale);
