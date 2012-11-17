@@ -215,7 +215,7 @@ void saveImageByPNG(NSImage *image, NSString* fileName)
 void showUsage()
 {
     printf("\n");
-    printf("Usage: dropshadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-owh] [FILE ...]\n");
+    printf("Usage: shadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-owh] [FILE ...]\n");
     printf("  -o  Without outline.\n");
     printf("  -w  Rewrite original file.\n");
     printf("  -h  Help.\n");

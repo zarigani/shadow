@@ -57,7 +57,7 @@ shadow
 -----
 
 ````
-Usage: dropshadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-owh] [FILE ...]
+Usage: shadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-owh] [FILE ...]
   -o  Without outline.
   -w  Rewrite original file.
   -h  Help.
