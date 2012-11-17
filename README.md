@@ -1,10 +1,10 @@
 shadow
 ======
 
+
 これは影の領域の大きさを変更するコマンドです。
 
-
-This is command controling shadow size.
+(This is command controling shadow size.)
 
 
 <table>
@@ -45,10 +45,15 @@ This is command controling shadow size.
 
 * OSX 10.6以上
 
+
 インストール
 ----------
 
-* command/shadowを/usr/local/bin/shadowへ、インストールすることをお勧めします。(Please move to `/usr/local/bin/shadow`)
+* command/shadow を /usr/local/bin/shadow へ、インストールすることをお勧めします。
+
+
+(Please move to `/usr/local/bin/shadow`)
+
 
 使い方
 -----
@@ -60,11 +65,11 @@ Usage: dropshadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-owh] [FILE ...]
   -h  Help.
 
 Example:
-  shadow test.png              ->  Default shadow(= shadow -a0.5 -b8 test.png)
-  shadow -b4 test.png          ->  Nano shadow
-  shadow -b2 test.png          ->  Line shadow
-  shadow -b0 -a0 test.png      ->  None shadow
-  shadow -b56 -a0.75 test.png  ->  OS X shadow
+  shadow test.png             ->  Default shadow(= shadow -a0.5 -b8 test.png)
+  shadow -b4 test.png         ->  Nano shadow
+  shadow -b2 test.png         ->  Line shadow
+  shadow -b0 -a0 test.png     ->  None shadow
+  shadow -b56 -a0.8 test.png  ->  OS X shadow
 ````
 
 * -a `ALPAH_VALUE`    `ALPAH_VALUE`は、影の透明度（0から1までの少数値、デフォルト=0.5）
