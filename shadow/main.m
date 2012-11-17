@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 extern float const BBKAlphaLimit;
-float const BBKAlphaLimit = 0.9;
+float const BBKAlphaLimit = 0.96;
 
 // ディスプレイスケールを取得する  // NSLog(@"scale = %f", scale);  //例 Retina scale = 2.000000
 CGFloat displayScale()
@@ -221,11 +221,11 @@ void showUsage()
     printf("  -h  Help.\n");
     printf("\n");
     printf("Example:\n");
-    printf("  shadow test.png              ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
-    printf("  shadow -b4 test.png          ->  Nano shadow\n");
-    printf("  shadow -b2 test.png          ->  Line shadow\n");
-    printf("  shadow -b0 -a0 test.png      ->  None shadow\n");
-    printf("  shadow -b56 -a0.75 test.png  ->  OS X shadow\n");
+    printf("  shadow test.png             ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
+    printf("  shadow -b4 test.png         ->  Nano shadow\n");
+    printf("  shadow -b2 test.png         ->  Line shadow\n");
+    printf("  shadow -b0 -a0 test.png     ->  None shadow\n");
+    printf("  shadow -b56 -a0.8 test.png  ->  OS X shadow\n");
 }
 
 
