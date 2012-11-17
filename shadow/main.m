@@ -141,7 +141,7 @@ NSImage* trimImageByRect(NSImage *image, NSRect trimRect)
 // 影付きイメージを描画して返す
 NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline)
 {
-    float margin = blurRadius * 1.25;
+    float margin = blurRadius;
     CGFloat scale = displayScale();
     //Retina環境に応じたポイントサイズを取得する
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
@@ -166,14 +166,9 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
         [shadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:alphaValue]];
         [shadow set];
         //描画する（輪郭線のため）
-        drawRect.origin = NSMakePoint(margin, margin);
+        drawRect.origin = NSMakePoint(margin, margin*1.25);
         drawRect.size = dotSize;
-        [image drawInRect:drawRect
-                 fromRect:NSZeroRect
-                operation:NSCompositeSourceOver
-                 fraction:1.0
-           respectFlipped:YES
-                    hints:nil];
+        [image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
     }
     //影の設定
     [shadow setShadowOffset:NSMakeSize(0.0, -blurRadius * 0.25)];
@@ -181,14 +176,9 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
     [shadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:alphaValue]];
     [shadow set];
     //描画する
-    drawRect.origin = NSMakePoint(margin, margin);
+    drawRect.origin = NSMakePoint(margin, margin*1.25);
     drawRect.size = dotSize;
-    [image drawInRect:drawRect
-             fromRect:NSZeroRect
-            operation:NSCompositeSourceOver
-             fraction:1.0
-       respectFlipped:YES
-                hints:nil];
+    [image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
     
     //描画環境を元に戻す、描画する場所=newImageから狙いを外す
     [NSGraphicsContext restoreGraphicsState];
@@ -217,10 +207,11 @@ void showUsage()
     printf("  -h  Help.\n");
     printf("\n");
     printf("Example:\n");
-    printf("  shadow test.png          ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
-    printf("  shadow -b4 test.png      ->  Nano shadow\n");
-    printf("  shadow -b2 test.png      ->  Line shadow\n");
-    printf("  shadow -b0 -a0 test.png  ->  None shadow\n");
+    printf("  shadow test.png              ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
+    printf("  shadow -b4 test.png          ->  Nano shadow\n");
+    printf("  shadow -b2 test.png          ->  Line shadow\n");
+    printf("  shadow -b0 -a0 test.png      ->  None shadow\n");
+    printf("  shadow -b56 -a0.75 test.png  ->  OS X shadow\n");
 }
 
 
