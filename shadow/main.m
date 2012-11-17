@@ -301,8 +301,8 @@ int main(int argc, char * argv[])
             image = dropshadowImage(image, blurRadius, alphaValue, outline);
             // PNG画像として保存する
             saveImageByPNG(image, outputPath);
-            // 画像情報を出力する
-            NSLog(@"%@ %@", outputPath, NSStringFromRect(imageRect));
+            // 変換した画像のファイルパスを出力する
+            puts([outputPath UTF8String]);
         }        
     }
     return 0;
