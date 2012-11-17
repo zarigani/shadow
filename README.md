@@ -2,10 +2,28 @@ shadow
 ======
 
 これは影の領域の大きさを変更するコマンドです。
+
+
 This is command controling shadow size.
 
-![sample.png](http://github.com/zarigani/shadow/tree/master/images/sample.png)
-![sample-shadow.png](http://github.com/zarigani/shadow/tree/master/images/sample-shadow.png)
+
+![sample.png](https://dl.dropbox.com/u/2281410/images/sample.png)
+
+
+![sample-shadow.png](https://dl.dropbox.com/u/2281410/images/sample-shadow.png)
+
+
+![sample-shadow-b4.png](https://dl.dropbox.com/u/2281410/images/sample-shadow-b4.png)
+
+
+![sample-shadow-b2.png](https://dl.dropbox.com/u/2281410/images/sample-shadow-b2.png)
+
+
+![sample-shadow-b0-a0.png](https://dl.dropbox.com/u/2281410/images/sample-shadow-b0-a0.png)
+
+
+![sample-shadow-b56-a0.8.png](https://dl.dropbox.com/u/2281410/images/sample-shadow-b56-a0.8.png)
+
 
 利用環境
 -------
