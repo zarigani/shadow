@@ -168,7 +168,14 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
         //描画する（輪郭線のため）
         drawRect.origin = NSMakePoint(margin, margin*1.25);
         drawRect.size = dotSize;
-        [image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+        //[image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+        //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
+        [image drawInRect:drawRect
+                 fromRect:NSZeroRect
+                operation:NSCompositeSourceOver
+                 fraction:1.0
+           respectFlipped:YES
+                    hints:nil];
     }
     //影の設定
     [shadow setShadowOffset:NSMakeSize(0.0, -blurRadius * 0.25)];
@@ -178,7 +185,14 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
     //描画する
     drawRect.origin = NSMakePoint(margin, margin*1.25);
     drawRect.size = dotSize;
-    [image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+    //[image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+    //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
+    [image drawInRect:drawRect
+             fromRect:NSZeroRect
+            operation:NSCompositeSourceOver
+             fraction:1.0
+       respectFlipped:YES
+                hints:nil];
     
     //描画環境を元に戻す、描画する場所=newImageから狙いを外す
     [NSGraphicsContext restoreGraphicsState];
