@@ -2,9 +2,9 @@ shadow
 ======
 
 
-これは影の領域の大きさを変更するコマンドです。
+これは影（透明度・大きさ・輪郭）の調整をするコマンドです。
 
-(This is command controling shadow size.)
+（This is a command to control the shadow(Transparency, Size, Outline).）
 
 
 <table>
@@ -50,9 +50,7 @@ shadow
 ----------
 
 * command/shadow を /usr/local/bin/shadow へ、インストールすることをお勧めします。
-
-
-(Please move to `/usr/local/bin/shadow`)
+* （Please move to `/usr/local/bin/shadow`）
 
 
 使い方
