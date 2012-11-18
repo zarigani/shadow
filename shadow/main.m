@@ -215,7 +215,7 @@ void saveImageByPNG(NSImage *image, NSString* fileName)
 void showUsage()
 {
     printf("\n");
-    printf("Usage: shadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-owh] [FILE ...]\n");
+    printf("Usage: shadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-s SUFFIX] [-owh] [FILE ...]\n");
     printf("  -o  Without outline.\n");
     printf("  -w  Rewrite original file.\n");
     printf("  -h  Help.\n");
@@ -240,11 +240,12 @@ int main(int argc, char * argv[])
         float alphaValue = 0.5; // -a
         bool outline = YES;     // -o
         bool rewrite = NO;      // -w
-        NSString *optText = @"";
+        NSString *suffix = @""; // -s
+        NSString *optText = @"-shadow";
         
         //opterr = 0;/* エラーメッセージを非表示にする */
         
-        while((opt = getopt(argc, argv, "a:b:owh")) != -1){
+        while((opt = getopt(argc, argv, "a:b:s:owh")) != -1){
             optText = [optText stringByAppendingString:[NSString stringWithFormat:@"-%c%s", opt, optarg ? optarg : ""]];
             switch(opt){
                 case 'a':
@@ -252,6 +253,9 @@ int main(int argc, char * argv[])
                     break;
                 case 'b':
                     sscanf(optarg, "%f", &blurRadius);
+                    break;
+                case 's':
+                    suffix = [NSString stringWithUTF8String:optarg];
                     break;
                 case 'o':
                     outline = NO;
@@ -285,7 +289,7 @@ int main(int argc, char * argv[])
             if (rewrite) {
                 outputPath = fPath;
             }else{
-                outputPath = [NSString stringWithFormat:@"%@-shadow%@.%@", fDirName, optText, fExt];
+                outputPath = [NSString stringWithFormat:@"%@%@.%@", fDirName, (suffix==@"")?optText:suffix, fExt];
             }
             
             NSImage *image = [[NSImage alloc] initWithContentsOfFile:fPath];
