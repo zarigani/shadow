@@ -10,6 +10,8 @@
 
 extern float const BBKAlphaLimit;
 float const BBKAlphaLimit = 0.96;
+extern float const BBKRateLimit;
+float const BBKRateLimit = 8.0;
 
 // ディスプレイスケールを取得する  // NSLog(@"scale = %f", scale);  //例 Retina scale = 2.000000
 CGFloat displayScale()
@@ -138,14 +140,42 @@ NSImage* trimImageByRect(NSImage *image, NSRect trimRect)
     return newImage;
 }
 
+NSSize resizeWidth(NSSize aSize, float zoom)
+{
+    if (zoom > BBKRateLimit) {
+        return NSMakeSize(zoom, aSize.height * zoom / aSize.width);
+    }else{
+        return NSMakeSize(aSize.width * zoom, aSize.height * zoom);
+    }
+}
+
+NSSize resizeHeight(NSSize aSize, float zoom)
+{
+    if (zoom > BBKRateLimit) {
+        return NSMakeSize(aSize.width * zoom / aSize.height, zoom);
+    }else{
+        return NSMakeSize(aSize.width * zoom, aSize.height * zoom);
+    }
+}
+
+NSSize resize(NSSize aSize, float zoom)
+{
+    if (aSize.width > aSize.height) {
+        return resizeWidth(aSize, zoom);
+    }else{
+        return resizeHeight(aSize, zoom);
+    }
+}
+
 // 影付きイメージを描画して返す
-NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline)
+NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline, float zoom)
 {
     float margin = blurRadius;
     CGFloat scale = displayScale();
+    if (zoom > BBKRateLimit && zoom > margin*2) zoom = zoom - margin*2;
     //Retina環境に応じたポイントサイズを取得する
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
-    NSSize dotSize = NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale);
+    NSSize dotSize = resize(NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale), zoom);
     //描画する場所を準備
     NSRect newRect = NSZeroRect;
     newRect.size.width = dotSize.width + margin*2;
@@ -215,10 +245,14 @@ void saveImageByPNG(NSImage *image, NSString* fileName)
 void showUsage()
 {
     printf("\n");
-    printf("Usage: shadow [-a ALPAH_VALUE(0-1)] [-b BLUR_RADIUS(0<=)] [-s SUFFIX] [-owh] [FILE ...]\n");
-    printf("  -o  Without outline.\n");
-    printf("  -w  Rewrite original file.\n");
-    printf("  -h  Help.\n");
+    printf("Usage: shadow [-a ALPAH_VALUE] [-b BLUR_RADIUS] [-s SUFFIX] [-z PXorRATE] [-owh] [FILE ...]\n");
+    printf("  -a ALPAH_VALUE    Shadow opacity (0 <= ALPAH_VALUE <= 1, Default: 0.5).\n");
+    printf("  -b BLUR_RADIUS    Shadow blur (0 <= BLUR_RADIUS, Default: 8.0).\n");
+    printf("  -s 'SUFFIX'       Add suffix.\n");
+    printf("  -z PXorRATE       Zoom output size (0 <= PXorRATE, Default: 1.0).\n");
+    printf("  -o                Without outline.\n");
+    printf("  -w                Rewrite original file.\n");
+    printf("  -h                Help.\n");
     printf("\n");
     printf("Example:\n");
     printf("  shadow test.png             ->  Default shadow(= shadow -a0.5 -b8 test.png)\n");
@@ -226,6 +260,10 @@ void showUsage()
     printf("  shadow -b2 test.png         ->  Line shadow\n");
     printf("  shadow -b0 -a0 test.png     ->  None shadow\n");
     printf("  shadow -b56 -a0.8 test.png  ->  OS X shadow\n");
+    printf("  shadow test.png -s '-nano'  ->  Output file name is 'test-nano.png'.\n");
+    printf("  shadow test.png -w          ->  Original 'test.png' is over written.\n");
+    printf("  shadow -z 500 test.png      ->  Limit maximum size to 500px (Retina is 1000px).\n");
+    printf("  shadow -z 0.7 test.png      ->  Zoom size to 0.7 times.\n");
 }
 
 
@@ -238,6 +276,7 @@ int main(int argc, char * argv[])
         int opt, i;
         float blurRadius = 8.0; // -b
         float alphaValue = 0.5; // -a
+        float zoomPxRate = 1;   // -z
         bool outline = YES;     // -o
         bool rewrite = NO;      // -w
         NSString *suffix = @""; // -s
@@ -245,7 +284,7 @@ int main(int argc, char * argv[])
         
         //opterr = 0;/* エラーメッセージを非表示にする */
         
-        while((opt = getopt(argc, argv, "a:b:s:owh")) != -1){
+        while((opt = getopt(argc, argv, "a:b:z:s:owh")) != -1){
             optText = [optText stringByAppendingString:[NSString stringWithFormat:@"-%c%s", opt, optarg ? optarg : ""]];
             switch(opt){
                 case 'a':
@@ -253,6 +292,9 @@ int main(int argc, char * argv[])
                     break;
                 case 'b':
                     sscanf(optarg, "%f", &blurRadius);
+                    break;
+                case 'z':
+                    sscanf(optarg, "%f", &zoomPxRate);
                     break;
                 case 's':
                     suffix = [NSString stringWithUTF8String:optarg];
@@ -302,7 +344,7 @@ int main(int argc, char * argv[])
                 image = transparentImageByAlphaValue(image);
             }
             // 影付きイメージを生成する
-            image = dropshadowImage(image, blurRadius, alphaValue, outline);
+            image = dropshadowImage(image, blurRadius, alphaValue, outline, zoomPxRate);
             // PNG画像として保存する
             saveImageByPNG(image, outputPath);
             // 変換した画像のファイルパスを出力する
