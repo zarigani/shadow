@@ -167,15 +167,57 @@ NSSize resize(NSSize aSize, float pxRate)
     }
 }
 
-// 影付きイメージを描画して返す
-NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline, float pxRate)
+// イメージを拡大・縮小して返す
+NSImage* zoomImage(NSImage *image, float blurRadius, float pxRate)
 {
     float margin = blurRadius;
     CGFloat scale = displayScale();
-    if (pxRate > BBKRateLimit && pxRate > margin*2) pxRate = pxRate - margin*2;
     //Retina環境に応じたポイントサイズを取得する
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
-    NSSize pointSize = resize(NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale), pxRate);
+    NSSize pixelSize = NSMakeSize(imageRep.pixelsWide, imageRep.pixelsHigh);
+    NSSize inSize;
+    if (pxRate > BBKRateLimit && pxRate >= pixelSize.width + margin*2 && pxRate >= pixelSize.height + margin*2) {
+        inSize = pixelSize;
+    }else if (pxRate > BBKRateLimit) {
+        inSize = resize(pixelSize, pxRate - margin*scale*2);
+    }else{
+        inSize = resize(pixelSize, pxRate);
+    }
+    
+    //描画する場所を準備
+    NSImage *newImage = [[NSImage alloc] initWithSize:resize(inSize, 1/scale)];
+    //描画する場所=newImageに狙いを定める、描画環境を保存しておく
+    [newImage lockFocus];
+    [NSGraphicsContext saveGraphicsState];
+    //拡大・縮小した時の補間品質の指定
+    [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+    //描画する
+    NSRect drawRect = {NSZeroPoint, resize(inSize, 1/scale)};
+    //[image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+    //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
+    [imageRep drawInRect:drawRect
+             fromRect:NSZeroRect
+            operation:NSCompositeSourceOver
+             fraction:1.0
+       respectFlipped:YES
+                hints:nil];
+    
+    //描画環境を元に戻す、描画する場所=newImageから狙いを外す
+    [NSGraphicsContext restoreGraphicsState];
+    [newImage unlockFocus];
+    
+    return newImage;
+}
+
+
+// 影付きイメージを描画して返す
+NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline)
+{
+    float margin = blurRadius;
+    CGFloat scale = displayScale();
+    //Retina環境に応じたポイントサイズを取得する
+    NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
+    NSSize pointSize = NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale);
     //描画する場所を準備
     NSRect newRect = NSZeroRect;
     newRect.size.width = pointSize.width + margin*2;
@@ -343,8 +385,10 @@ int main(int argc, char * argv[])
                 // 影の部分を透明にする
                 image = transparentImageByAlphaValue(image);
             }
+            // イメージを拡大・縮小する
+            image = zoomImage(image, blurRadius, zoomPxRate);
             // 影付きイメージを生成する
-//            image = dropshadowImage(image, blurRadius, alphaValue, outline, zoomPxRate);
+            image = dropshadowImage(image, blurRadius, alphaValue, outline);
             // PNG画像として保存する
             saveImageByPNG(image, outputPath);
             // 変換した画像のファイルパスを出力する
