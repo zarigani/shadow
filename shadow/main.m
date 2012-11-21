@@ -39,7 +39,8 @@ NSImage* transparentImageByAlphaValue(NSImage* image)
             if (a < BBKAlphaLimit) {
 //                NSLog(@"(%i, %i) %f %f %f %f", x, y,a, r, g, b);
                 // alpha:0.0よりも、alpha:a*rよりも、alpha:a*r*g*bの方が、アンチエイリアスが残って秀逸
-                color = [NSColor colorWithCalibratedRed:r green:g blue:b alpha:a*r*g*b];
+//                color = [NSColor colorWithCalibratedRed:r green:g blue:b alpha:a*r*g*b];
+                color = [NSColor colorWithCalibratedRed:r/a green:g/a blue:b/a alpha:a*r*g*b];
                 [imageRep setColor:color atX:x y:y];
             }
         }
