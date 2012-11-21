@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 extern float const BBKAlphaLimit;
-float const BBKAlphaLimit = 0.96;
+float const BBKAlphaLimit = 1.0;
 extern float const BBKRateLimit;
 float const BBKRateLimit = 8.0;
 
@@ -30,17 +30,17 @@ CGFloat displayScale()
 NSImage* transparentImageByAlphaValue(NSImage* image)
 {
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
-    NSColor *clearColor = [NSColor colorWithCalibratedRed:0.0 green:0.0 blue:0.0 alpha:0.0];
+    NSColor *color;
+    CGFloat r,g,b,a;
     for (int y=0; y<imageRep.pixelsHigh; y++) {
         for (int x=0; x<imageRep.pixelsWide; x++) {
-            NSColor *color = [imageRep colorAtX:x y:y];
-            if ([color alphaComponent] < BBKAlphaLimit) {
-//                CGFloat a = [color alphaComponent];
-//                CGFloat r = [color redComponent];
-//                CGFloat g = [color greenComponent];
-//                CGFloat b = [color blueComponent];
+            color = [imageRep colorAtX:x y:y];
+            [color getRed:&r green:&g blue:&b alpha:&a];
+            if (a < BBKAlphaLimit) {
 //                NSLog(@"(%i, %i) %f %f %f %f", x, y,a, r, g, b);
-                [imageRep setColor:clearColor atX:x y:y];
+                // alpha:0.0よりも、alpha:a*rよりも、alpha:a*r*g*bの方が、アンチエイリアスが残って秀逸
+                color = [NSColor colorWithCalibratedRed:r green:g blue:b alpha:a*r*g*b];
+                [imageRep setColor:color atX:x y:y];
             }
         }
     }
