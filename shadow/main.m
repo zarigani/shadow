@@ -140,42 +140,42 @@ NSImage* trimImageByRect(NSImage *image, NSRect trimRect)
     return newImage;
 }
 
-NSSize resizeWidth(NSSize aSize, float zoom)
+NSSize resizeWidth(NSSize aSize, float pxRate)
 {
-    if (zoom > BBKRateLimit) {
-        return NSMakeSize(zoom, aSize.height * zoom / aSize.width);
+    if (pxRate > BBKRateLimit) {
+        return NSMakeSize(pxRate, aSize.height * pxRate / aSize.width);
     }else{
-        return NSMakeSize(aSize.width * zoom, aSize.height * zoom);
+        return NSMakeSize(aSize.width * pxRate, aSize.height * pxRate);
     }
 }
 
-NSSize resizeHeight(NSSize aSize, float zoom)
+NSSize resizeHeight(NSSize aSize, float pxRate)
 {
-    if (zoom > BBKRateLimit) {
-        return NSMakeSize(aSize.width * zoom / aSize.height, zoom);
+    if (pxRate > BBKRateLimit) {
+        return NSMakeSize(aSize.width * pxRate / aSize.height, pxRate);
     }else{
-        return NSMakeSize(aSize.width * zoom, aSize.height * zoom);
+        return NSMakeSize(aSize.width * pxRate, aSize.height * pxRate);
     }
 }
 
-NSSize resize(NSSize aSize, float zoom)
+NSSize resize(NSSize aSize, float pxRate)
 {
     if (aSize.width > aSize.height) {
-        return resizeWidth(aSize, zoom);
+        return resizeWidth(aSize, pxRate);
     }else{
-        return resizeHeight(aSize, zoom);
+        return resizeHeight(aSize, pxRate);
     }
 }
 
 // 影付きイメージを描画して返す
-NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline, float zoom)
+NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, bool outline, float pxRate)
 {
     float margin = blurRadius;
     CGFloat scale = displayScale();
-    if (zoom > BBKRateLimit && zoom > margin*2) zoom = zoom - margin*2;
+    if (pxRate > BBKRateLimit && pxRate > margin*2) pxRate = pxRate - margin*2;
     //Retina環境に応じたポイントサイズを取得する
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
-    NSSize dotSize = resize(NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale), zoom);
+    NSSize dotSize = resize(NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale), pxRate);
     //描画する場所を準備
     NSRect newRect = NSZeroRect;
     newRect.size.width = dotSize.width + margin*2;
