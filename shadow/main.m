@@ -175,11 +175,11 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
     if (pxRate > BBKRateLimit && pxRate > margin*2) pxRate = pxRate - margin*2;
     //Retina環境に応じたポイントサイズを取得する
     NSBitmapImageRep* imageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
-    NSSize dotSize = resize(NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale), pxRate);
+    NSSize pointSize = resize(NSMakeSize(imageRep.pixelsWide/scale, imageRep.pixelsHigh/scale), pxRate);
     //描画する場所を準備
     NSRect newRect = NSZeroRect;
-    newRect.size.width = dotSize.width + margin*2;
-    newRect.size.height = dotSize.height + margin*2;
+    newRect.size.width = pointSize.width + margin*2;
+    newRect.size.height = pointSize.height + margin*2;
     NSImage *newImage = [[NSImage alloc] initWithSize:newRect.size];
     //描画する場所=newImageに狙いを定める、描画環境を保存しておく
     [newImage lockFocus];
@@ -197,7 +197,7 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
         [shadow set];
         //描画する（輪郭線のため）
         drawRect.origin = NSMakePoint(margin, margin*1.25);
-        drawRect.size = dotSize;
+        drawRect.size = pointSize;
         //[image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
         //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
         [image drawInRect:drawRect
@@ -214,7 +214,7 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
     [shadow set];
     //描画する
     drawRect.origin = NSMakePoint(margin, margin*1.25);
-    drawRect.size = dotSize;
+    drawRect.size = pointSize;
     //[image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
     //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
     [image drawInRect:drawRect
@@ -344,7 +344,7 @@ int main(int argc, char * argv[])
                 image = transparentImageByAlphaValue(image);
             }
             // 影付きイメージを生成する
-            image = dropshadowImage(image, blurRadius, alphaValue, outline, zoomPxRate);
+//            image = dropshadowImage(image, blurRadius, alphaValue, outline, zoomPxRate);
             // PNG画像として保存する
             saveImageByPNG(image, outputPath);
             // 変換した画像のファイルパスを出力する
