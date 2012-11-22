@@ -305,7 +305,7 @@ void showUsage()
     printf("  shadow -b56 -a0.8 test.png  ->  OS X shadow\n");
     printf("  shadow test.png -s '-nano'  ->  Output file name is 'test-nano.png'.\n");
     printf("  shadow test.png -w          ->  Original 'test.png' is over written.\n");
-    printf("  shadow -z 500 test.png      ->  Limit maximum size to 500px (Retina is 1000px).\n");
+    printf("  shadow -z 500 test.png      ->  Limit maximum size to 500px.\n");
     printf("  shadow -z 0.7 test.png      ->  Zoom size to 0.7 times.\n");
 }
 

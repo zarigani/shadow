@@ -57,8 +57,8 @@ shadow
 -----
 ````
 Usage: shadow [-a ALPAH_VALUE] [-b BLUR_RADIUS] [-s SUFFIX] [-z PXorRATE] [-owh] [FILE ...]
-  -a ALPAH\_VALUE    影の不透明度 (0 <= ALPAH_VALUE <= 1, デフォルト: 0.5).
-  -b BLUR\_RADIUS    影のぼけ具合 (0 <= BLUR_RADIUS, デフォルト: 8.0).
+  -a ALPAH_VALUE    影の不透明度 (0 <= ALPAH_VALUE <= 1, デフォルト: 0.5).
+  -b BLUR_RADIUS    影のぼけ具合 (0 <= BLUR_RADIUS, デフォルト: 8.0).
   -s 'SUFFIX'       出力画像のファイル名に付加する文字列指定する.
   -z PXorRATE       出力画像のサイズを指定する (0 <= PXorRATE, Default: 1.0).
   -o                輪郭なし.
@@ -73,14 +73,14 @@ Example:
   shadow -b56 -a0.8 test.png  ->  OS X shadow
   shadow test.png -s '-nano'  ->  出力画像のファイル名が'test-nano.png'になる.
   shadow test.png -w          ->  元画像の'test.png'に上書きする.
-  shadow -z 500 test.png      ->  出力画像の最大サイズを500pxに制限する (Retina環境では1000px).
+  shadow -z 500 test.png      ->  出力画像の最大サイズを500pxに制限する.
   shadow -z 0.7 test.png      ->  出力画像のサイズを0.7倍する.
 ````
 
 ````
 Usage: shadow [-a ALPAH_VALUE] [-b BLUR_RADIUS] [-s SUFFIX] [-z PXorRATE] [-owh] [FILE ...]
-  -a ALPAH\_VALUE    Shadow opacity (0 <= ALPAH_VALUE <= 1, Default: 0.5).
-  -b BLUR\_RADIUS    Shadow blur (0 <= BLUR_RADIUS, Default: 8.0).
+  -a ALPAH_VALUE    Shadow opacity (0 <= ALPAH_VALUE <= 1, Default: 0.5).
+  -b BLUR_RADIUS    Shadow blur (0 <= BLUR_RADIUS, Default: 8.0).
   -s 'SUFFIX'       Add suffix.
   -z PXorRATE       Zoom output size (0 <= PXorRATE, Default: 1.0).
   -o                Without outline.
@@ -95,6 +95,6 @@ Example:
   shadow -b56 -a0.8 test.png  ->  OS X shadow
   shadow test.png -s '-nano'  ->  Output file name is 'test-nano.png'.
   shadow test.png -w          ->  Original 'test.png' is over written.
-  shadow -z 500 test.png      ->  Limit maximum size to 500px (Retina is 1000px).
+  shadow -z 500 test.png      ->  Limit maximum size to 500px.
   shadow -z 0.7 test.png      ->  Zoom size to 0.7 times.
 ````
