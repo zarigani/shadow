@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 extern float const BBKAlphaLimit;
-float const BBKAlphaLimit = 1.0;
+float const BBKAlphaLimit = 0.95;
 extern float const BBKRateLimit;
 float const BBKRateLimit = 8.0;
 
