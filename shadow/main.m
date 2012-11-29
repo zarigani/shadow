@@ -159,8 +159,10 @@ NSSize resizeHeight(NSSize aSize, float pxRate)
     }
 }
 
-NSSize resize(NSSize aSize, float pxRate)
+NSSize resize(NSSize aSize, float pxRate, NSString *zoomOpt)
 {
+    if (zoomOpt == @"W") return resizeWidth(aSize, pxRate);
+    if (zoomOpt == @"H") return resizeHeight(aSize, pxRate);
     if (aSize.width > aSize.height) {
         return resizeWidth(aSize, pxRate);
     }else{
@@ -169,7 +171,7 @@ NSSize resize(NSSize aSize, float pxRate)
 }
 
 // イメージを拡大・縮小して返す
-NSImage* zoomImage(NSImage *image, float blurRadius, float pxRate)
+NSImage* zoomImage(NSImage *image, float blurRadius, float pxRate, NSString *zoomOpt)
 {
     float margin = blurRadius;
     CGFloat scale = displayScale();
@@ -180,20 +182,20 @@ NSImage* zoomImage(NSImage *image, float blurRadius, float pxRate)
     if (pxRate > BBKRateLimit && pxRate >= pixelSize.width + margin*2 && pxRate >= pixelSize.height + margin*2) {
         inSize = pixelSize;
     }else if (pxRate > BBKRateLimit) {
-        inSize = resize(pixelSize, pxRate - margin*scale*2);
+        inSize = resize(pixelSize, pxRate - margin*scale*2, zoomOpt);
     }else{
-        inSize = resize(pixelSize, pxRate);
+        inSize = resize(pixelSize, pxRate, zoomOpt);
     }
     
     //描画する場所を準備
-    NSImage *newImage = [[NSImage alloc] initWithSize:resize(inSize, 1/scale)];
+    NSImage *newImage = [[NSImage alloc] initWithSize:resize(inSize, 1/scale, zoomOpt)];
     //描画する場所=newImageに狙いを定める、描画環境を保存しておく
     [newImage lockFocus];
     [NSGraphicsContext saveGraphicsState];
     //拡大・縮小した時の補間品質の指定
     [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
     //描画する
-    NSRect drawRect = {NSZeroPoint, resize(inSize, 1/scale)};
+    NSRect drawRect = {NSZeroPoint, resize(inSize, 1/scale, zoomOpt)};
     //[image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
     //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
     [imageRep drawInRect:drawRect
@@ -293,6 +295,8 @@ void showUsage()
     printf("  -b BLUR_RADIUS    Shadow blur (0 <= BLUR_RADIUS, Default: 8.0).\n");
     printf("  -s 'SUFFIX'       Add suffix.\n");
     printf("  -z PXorRATE       Zoom output size (0 <= PXorRATE, Default: 1.0).\n");
+    printf("  -W                'Wz900' resample width to 900px. It may expand.\n");
+    printf("  -H                'Hz900' resample Height to 900px. It may expand.\n");
     printf("  -o                Without outline.\n");
     printf("  -w                Rewrite original file.\n");
     printf("  -h                Help.\n");
@@ -323,11 +327,12 @@ int main(int argc, char * argv[])
         bool outline = YES;     // -o
         bool rewrite = NO;      // -w
         NSString *suffix = @""; // -s
+        NSString *zoomOpt = @"";// -WH
         NSString *optText = @"-shadow";
         
         //opterr = 0;/* エラーメッセージを非表示にする */
         
-        while((opt = getopt(argc, argv, "a:b:z:s:owh")) != -1){
+        while((opt = getopt(argc, argv, "a:b:WHz:s:owh")) != -1){
             optText = [optText stringByAppendingString:[NSString stringWithFormat:@"-%c%s", opt, optarg ? optarg : ""]];
             switch(opt){
                 case 'a':
@@ -341,6 +346,12 @@ int main(int argc, char * argv[])
                     break;
                 case 's':
                     suffix = [NSString stringWithUTF8String:optarg];
+                    break;
+                case 'W':
+                    zoomOpt = @"W";
+                    break;
+                case 'H':
+                    zoomOpt = @"H";
                     break;
                 case 'o':
                     outline = NO;
@@ -387,7 +398,7 @@ int main(int argc, char * argv[])
                 image = transparentImageByAlphaValue(image);
             }
             // イメージを拡大・縮小する
-            image = zoomImage(image, blurRadius, zoomPxRate);
+            image = zoomImage(image, blurRadius, zoomPxRate, zoomOpt);
             // 影付きイメージを生成する
             image = dropshadowImage(image, blurRadius, alphaValue, outline);
             // PNG画像として保存する
