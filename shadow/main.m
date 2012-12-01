@@ -144,18 +144,18 @@ NSImage* trimImageByRect(NSImage *image, NSRect trimRect)
 NSSize resizeWidth(NSSize aSize, float pxRate)
 {
     if (pxRate > BBKRateLimit) {
-        return NSMakeSize(pxRate, aSize.height * pxRate / aSize.width);
+        return NSMakeSize(pxRate, round(aSize.height * pxRate / aSize.width));
     }else{
-        return NSMakeSize(aSize.width * pxRate, aSize.height * pxRate);
+        return NSMakeSize(round(aSize.width * pxRate), round(aSize.height * pxRate));
     }
 }
 
 NSSize resizeHeight(NSSize aSize, float pxRate)
 {
     if (pxRate > BBKRateLimit) {
-        return NSMakeSize(aSize.width * pxRate / aSize.height, pxRate);
+        return NSMakeSize(round(aSize.width * pxRate / aSize.height), pxRate);
     }else{
-        return NSMakeSize(aSize.width * pxRate, aSize.height * pxRate);
+        return NSMakeSize(round(aSize.width * pxRate), round(aSize.height * pxRate));
     }
 }
 
