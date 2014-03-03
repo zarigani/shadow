@@ -234,6 +234,8 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
     
     NSShadow *shadow = [[NSShadow alloc] init];
     NSRect drawRect;
+    drawRect.origin = NSMakePoint(margin, roundf(margin*1.25));
+    drawRect.size = pointSize;
     if (outline) {
         //影の設定（輪郭線のため）
         [shadow setShadowOffset:NSZeroSize];
@@ -241,8 +243,6 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
         [shadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:alphaValue]];
         [shadow set];
         //描画する（輪郭線のため）
-        drawRect.origin = NSMakePoint(margin, margin*1.25);
-        drawRect.size = pointSize;
         //[image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
         //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
         [image drawInRect:drawRect
@@ -258,8 +258,6 @@ NSImage* dropshadowImage(NSImage *image, float blurRadius, float alphaValue, boo
     [shadow setShadowColor:[[NSColor blackColor] colorWithAlphaComponent:alphaValue]];
     [shadow set];
     //描画する
-    drawRect.origin = NSMakePoint(margin, margin*1.25);
-    drawRect.size = pointSize;
     //[image drawAtPoint:drawRect.origin fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
     //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
     [image drawInRect:drawRect
