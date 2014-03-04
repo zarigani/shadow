@@ -200,7 +200,7 @@ NSImage* zoomImage(NSImage *image, float blurRadius, float pxRate, NSString *zoo
     //drawAtPointでは、画像によっては解像度に2倍の差が出てしまうため、drawInRectで描画した
     [imageRep drawInRect:drawRect
              fromRect:NSZeroRect
-            operation:NSCompositeSourceOver
+            operation:NSCompositeCopy
              fraction:1.0
        respectFlipped:YES
                 hints:nil];
